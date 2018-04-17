@@ -1,23 +1,31 @@
 ## How to run this node code
 
-Make sure you have node version 8.x or above installed. This was coded on 8.11.1 but
-it should work with any machine that is capable of handling ES6 JavaScript. To install
-the sleep module, run "npm install" before running the code. 
+git clone https://github.com/stevenpovlitz/bathroom-simulation.git
 
-Run with command "node bathroom.js"
+npm install
 
-For optimal viewing, increase the size of text and shrink the terminal window such
-that only one record is visible at once, causing it to appear to be 'updating'.
+node bathroom.js
+
+## What is this code
+
+This code simulates a bathroom that can hold up to three women or three men, but
+not a mix of the two. While a single woman is in the bathroom, additional women
+may enter (and vice versa for men). This allows for resource starvation, where
+one group monopolizes the resource for a long amount of time.
 
 ## General analysis of the code and starvation
 
-In my code, here is an explanation (in //comments) of the output:
+Here is an explanation (in //comments) of the output:
 
 t: 401 - next person:  {f:5} // time and new person created (if one is created)
+
 manQueue:   3 // number of men outside of bathroom
+
 womanQueue:   3
+
 inside: [" {f:1} "," {f:2} "," {f:3} "] // representation of the 3 stalls in bathroom
 
+## Parameters 
 
 The code "Math.floor(Math.random() * 4 + 2)" decides how long the person will need to
 stay in the bathroom, meaning it is in the interval [2, 5].
