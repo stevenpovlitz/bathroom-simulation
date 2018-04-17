@@ -1,7 +1,8 @@
 ## How to run this node code
 
 Make sure you have node version 8.x or above installed. This was coded on 8.11.1 but
-it should work with any machine that is capable of handling ES6 JavaScript.
+it should work with any machine that is capable of handling ES6 JavaScript. To install
+the sleep module, run "npm install" before running the code. 
 
 Run with command "node bathroom.js"
 
