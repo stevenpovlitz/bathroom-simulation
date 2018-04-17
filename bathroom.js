@@ -1,5 +1,7 @@
+let sleep = require('sleep'); // allows for blocking of code (for 1 second ticks)
+
 class Person {
-   constructor(startTime, gender, stayTime = 2) {
+   constructor(startTime, gender, stayTime = 3) {
       this.startTime = startTime;
       this.gender = gender;
       this.stayTime = stayTime;
@@ -25,10 +27,10 @@ class Bathroom {
    addToQueue(p1) {
       if (p1.gender == 'male') {
          this.manQueue.push(p1);
-         this.manQueue.sort(function(a, b) {return b.startTime - a.startTime})
+         this.manQueue.sort(function(a, b) {return a.startTime - b.startTime})
       } else {
          this.womanQueue.push(p1);
-         this.womanQueue.sort(function(a, b) {return b.startTime - a.startTime})
+         this.womanQueue.sort(function(a, b) {return a.startTime - b.startTime})
       }
    }
    // remove people from bathroom, then fill up all slots from appropriate queue if possible
@@ -45,15 +47,15 @@ class Bathroom {
       // such as being full or the correct queue being empty
       let continueAdding = true;
       while (continueAdding) {
-         const longestWaitWoman = this.womanQueue.length > 1 ? this.womanQueue[this.womanQueue.length-1].startTime : -1;
-         const longestWaitMan = this.manQueue.length > 1 ? this.manQueue[this.manQueue.length-1].startTime : -1;
+         const longestWaitWoman = this.womanQueue.length > 0 ? this.womanQueue[this.womanQueue.length-1].startTime : -1;
+         const longestWaitMan = this.manQueue.length > 0 ? this.manQueue[this.manQueue.length-1].startTime : -1;
 
          if (this.inBathroom.length >= this.bathroomMax || longestWaitWoman == -1 && longestWaitMan == -1) {
             continueAdding = false;
-         } else if (longestWaitWoman > longestWaitMan && (this.inBathroom.length == 0 || this.inBathroom[0].gender == 'female')) {
+         } else if ((longestWaitWoman >= longestWaitMan && this.inBathroom.length == 0) || (this.inBathroom.length > 0 && this.inBathroom[0].gender == 'female' && longestWaitWoman != -1)) {
             this.inBathroom.push(this.womanQueue.pop());
-         } else if (longestWaitMan > longestWaitWoman && (this.inBathroom.length == 0 || this.inBathroom[0].gender == 'male')) {
-            this.inBathroom.push(this.manQueue[this.manQueue.length-1]);
+         } else if ((longestWaitMan >= longestWaitWoman && this.inBathroom.length == 0) || (this.inBathroom.length > 0 && this.inBathroom[0].gender == 'male' && longestWaitMan != -1)) {
+            this.inBathroom.push(this.manQueue.pop());
          } else {
             continueAdding = false;
          }
@@ -61,28 +63,33 @@ class Bathroom {
 
    }
    stringify() {
-      console.log(`manQueue: ${JSON.stringify(this.manQueue)}\nwomanQueue: ${JSON.stringify(this.womanQueue)}\ninside: ${JSON.stringify(this.inBathroom)}\n`);
+      console.log(`manQueue: ${String(this.manQueue.length).padStart(3)}\nwomanQueue: ${String(this.womanQueue.length).padStart(3)}\ninside: ${JSON.stringify(this.inBathroom.map(prettyPeople))}\n`);
+      console.log('\n\n\n\n\n\n\n\n\n\n\n');
    }
 }
 
+// allows displaying a person object in a simple, 'pretty' way like this: ' {m:4} '
+function prettyPeople(a) {
+   return ` {${a.gender[0]}:${a.stayTime}} `
+}
+
 function runSimulation() {
-   let steven = new Person(3, 'male', 1);
-   let john = new Person(6, 'male', 2);
-   let abby = new Person(8, 'female', 2);
-   let sarah = new Person(2, 'female', 2);
-
    let b1 = new Bathroom();
-
-   b1.wantsToEnter(steven);
-   b1.wantsToEnter(john);
-   b1.wantsToEnter(sarah);
-   b1.wantsToEnter(abby);
-
-   b1.stringify();
-   b1.timeTick();
-   b1.stringify();
-   b1.timeTick();
-   b1.stringify();
+   let tick = 1; // will inc with each run of the loop
+   while (true) {
+      if ( Math.floor(Math.random() * 2) ) {
+         let p1 = new Person(tick, Math.floor(Math.random() * 2) == 0 ? 'male' : 'female', Math.floor(Math.random() * 4 + 2));
+         console.log(`t: ${String(tick).padStart(2)}` + ' - next person: ' + prettyPeople(p1));
+         b1.wantsToEnter(p1);
+      } else {
+         console.log(`t: ${String(tick).padStart(2)}` + ' - no next person');
+      }
+      b1.stringify();
+      // console.log(JSON.stringify(b1) + "\n\n"); // DEBUG
+      b1.timeTick();
+      tick++;
+      sleep.sleep(1);
+   }
 }
 
 runSimulation();
